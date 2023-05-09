@@ -27,9 +27,10 @@ drink.addComponent(new Transform({
 
 // Create and add animator component
 drink.addComponent(new Animator())
+const drinkclip = new AnimationState("sodaAction")
 
 // Instance and add a clip
-drink.getComponent(Animator).addClip(new AnimationState("sodaAction"))
+drink.getComponent(Animator).addClip(drinkclip)
 
 
 
@@ -55,12 +56,21 @@ refill.addComponent(new GLTFShape("models/soda.glb"))
 refill.addComponent(new Transform({ position: new Vector3(8, .3, 5), scale: new Vector3(.8, .8, .8) }))
 engine.addEntity(refill)
 refill.addComponent(new OnPointerDown(() => {
+
+let transform = drink.getComponent(Transform)
+
   if (!hasDrink) {
     hasDrink = true
     ui.displayAnnouncement("Press E to Start drinking!")
     engine.addEntity(drink)
+    engine.removeEntity(refill)
+
+    transform.position.x = 0.5
+    transform.position.y = 0.25
+    transform.rotation = Quaternion.Zero()
+    transform.position.z = 0.6
     drink.setParent(Attachable.AVATAR)
-    newTimer(15)
+    newTimer(300)
   }
 }, {
   button: ActionButton.POINTER,
@@ -68,13 +78,13 @@ refill.addComponent(new OnPointerDown(() => {
 }))
 
 async function initDrinkingGame() {
-  health = new ui.UIBar(0, -25, -15, Color4.Red(), ui.BarStyles.ROUNDSILVER, 1)
-  drinkCounter = new ui.UICounter(drinkCount, -115, -25, undefined, 28)
+  health = new ui.UIBar(0, -600, -15, Color4.Magenta(), ui.BarStyles.ROUNDSILVER, 1)
+  drinkCounter = new ui.UICounter(drinkCount, -700, -25, undefined, 28)
 }
 
 async function drankDrink() {
   hasDrink = false
-  ui.displayAnnouncement("drink gone!")
+  ui.displayAnnouncement("Refill !")
   drinkCount++
   drink.getComponent(Animator).getClip("sodaAction").stop()
   if (drinkCount >= 5) {
@@ -98,20 +108,25 @@ Input.instance.subscribe("BUTTON_DOWN", ActionButton.PRIMARY, false, async () =>
       const transform = refill.getComponent(Transform)
       drink.setParent(null)
       engine.removeEntity(drink)
-      const forwardVector: Vector3 = Vector3.Forward()
-        .scale(Z_OFFSET)
-        .rotate(Camera.instance.rotation)
-      transform.position = Camera.instance.position.clone().add(forwardVector)
-      transform.lookAt(Camera.instance.position)
-      transform.rotation.x = 0
-      transform.rotation.z = 0
-      transform.position.y = GROUND_HEIGHT
+      engine.addEntity(refill)
+      //const forwardVector: Vector3 = Vector3.Forward()
+        //.scale(Z_OFFSET)
+        //.rotate(Camera.instance.rotation)
+      //transform.position = Camera.instance.position.clone().add(forwardVector)
+      //transform.lookAt(Camera.instance.position)
+      //transform.rotation.x = 0
+      //transform.rotation.z = 0
+      //transform.position.y = GROUND_HEIGHT
+      
+      //Place drink at the bar
+      refill.addComponent(new Transform({ position: new Vector3(8, .3, 5), scale: new Vector3(.8, .8, .8) }))
       drink.getComponent(Animator).getClip("sodaAction").stop()
     }
     else {
       if (health.read() < 1) {
         health.increase()
         drink.getComponent(Animator).getClip("sodaAction").play()
+        drinkclip.looping = false
       }
     }
   }
