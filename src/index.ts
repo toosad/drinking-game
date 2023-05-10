@@ -9,6 +9,33 @@ export let hasEmptyDrink: boolean = false
 export let gameStarted: boolean = false
 export let drinkCount: number = 0
 export let drinkCounter: ui.UICounter
+
+//drinking sound effects
+const drunksound1 = new Entity()
+const tipsyclip = new AudioClip('sounds/tipsy.mp3')
+const tipsysource = new AudioSource(tipsyclip)
+drunksound1.addComponent(tipsysource)
+drunksound1.addComponent(new Transform())
+drunksound1.getComponent(Transform).position = Camera.instance.position
+engine.addEntity(drunksound1)
+
+const drinkingsound = new Entity()
+const drinkingclip = new AudioClip('sounds/navigationForward.mp3')
+const drinkingsource = new AudioSource(drinkingclip)
+drinkingsound.addComponent(drinkingsource)
+drinkingsound.addComponent(new Transform())
+drinkingsound.getComponent(Transform).position = Camera.instance.position
+engine.addEntity(drinkingsound)
+
+const drinkingsound2 = new Entity()
+const drinkingclip2 = new AudioClip('sounds/star-collect.mp3')
+const drinkingsource2 = new AudioSource(drinkingclip2)
+drinkingsound2.addComponent(drinkingsource2)
+drinkingsound2.addComponent(new Transform())
+drinkingsound2.getComponent(Transform).position = Camera.instance.position
+engine.addEntity(drinkingsound2)
+
+
 // Create an entity
 const drink = new Entity()
 const Z_OFFSET = 1.5
@@ -42,6 +69,7 @@ gameTrigger.addComponent(new utils.TriggerComponent(new utils.TriggerBoxShape(ne
   enableDebug: true,
   onCameraEnter: () => {
     engine.removeEntity(gameTrigger)
+    ui.displayAnnouncement("Welcome BAR")
     initDrinkingGame()
   },
   onCameraExit: () => {
@@ -70,7 +98,7 @@ let transform = drink.getComponent(Transform)
     transform.rotation = Quaternion.Zero()
     transform.position.z = 0.6
     drink.setParent(Attachable.AVATAR)
-    newTimer(300)
+    newTimer(60)
   }
 }, {
   button: ActionButton.POINTER,
@@ -89,10 +117,19 @@ async function drankDrink() {
   drink.getComponent(Animator).getClip("sodaAction").stop()
   if (drinkCount >= 5) {
     VeryDrunk.show()
-  }
+    
+//sound effect
+ tipsysource.playing = true
+ tipsysource.playOnce()
+}
+
   drinkCounter.set(drinkCount)
   health.set(0)
   Drunk.show()
+
+  //sound effect
+  drinkingsource2.playing = true
+  drinkingsource2.playOnce()
 
 
 }
@@ -127,6 +164,10 @@ Input.instance.subscribe("BUTTON_DOWN", ActionButton.PRIMARY, false, async () =>
         health.increase()
         drink.getComponent(Animator).getClip("sodaAction").play()
         drinkclip.looping = false
+
+        //sound effect
+        drinkingsource.playing = true
+        drinkingsource.playOnce()
       }
     }
   }
