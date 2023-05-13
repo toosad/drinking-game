@@ -85,7 +85,7 @@ refill.addComponent(new Transform({ position: new Vector3(8, .3, 5), scale: new 
 engine.addEntity(refill)
 refill.addComponent(new OnPointerDown(() => {
 
-let transform = drink.getComponent(Transform)
+  let transform = drink.getComponent(Transform)
 
   if (!hasDrink) {
     hasDrink = true
@@ -116,16 +116,16 @@ async function drankDrink() {
   drinkCount++
   drink.getComponent(Animator).getClip("sodaAction").stop()
   if (drinkCount >= 5) {
-    VeryDrunk.show()
-    
-//sound effect
- tipsysource.playing = true
- tipsysource.playOnce()
-}
+    VdrunkImage()
+
+    //sound effect
+    tipsysource.playing = true
+    tipsysource.playOnce()
+  }
 
   drinkCounter.set(drinkCount)
   health.set(0)
-  Drunk.show()
+  drunkImage()
 
   //sound effect
   drinkingsource2.playing = true
@@ -140,21 +140,21 @@ Input.instance.subscribe("BUTTON_DOWN", ActionButton.PRIMARY, false, async () =>
       await drankDrink()
       hasEmptyDrink = true
     }
-    if(hasEmptyDrink){
+    if (hasEmptyDrink) {
       hasEmptyDrink = false
       const transform = refill.getComponent(Transform)
       drink.setParent(null)
       engine.removeEntity(drink)
       engine.addEntity(refill)
       //const forwardVector: Vector3 = Vector3.Forward()
-        //.scale(Z_OFFSET)
-        //.rotate(Camera.instance.rotation)
+      //.scale(Z_OFFSET)
+      //.rotate(Camera.instance.rotation)
       //transform.position = Camera.instance.position.clone().add(forwardVector)
       //transform.lookAt(Camera.instance.position)
       //transform.rotation.x = 0
       //transform.rotation.z = 0
       //transform.position.y = GROUND_HEIGHT
-      
+
       //Place drink at the bar
       refill.addComponent(new Transform({ position: new Vector3(8, .3, 5), scale: new Vector3(.8, .8, .8) }))
       drink.getComponent(Animator).getClip("sodaAction").stop()
@@ -173,7 +173,22 @@ Input.instance.subscribe("BUTTON_DOWN", ActionButton.PRIMARY, false, async () =>
   }
 })
 
+function drunkImage() {
+  Drunk.show()
+  utils.setTimeout(5000, () => {
+    Drunk.hide()
+  })
 
+}
+
+
+function VdrunkImage() {
+  VeryDrunk.show()
+  utils.setTimeout(5000, () => {
+    VeryDrunk.hide()
+  })
+
+}
 
 
 
@@ -197,30 +212,30 @@ let VeryDrunk = new ui.CenterImage('images/veryDrunkScreen.png', 1, true, 0, 0, 
 
 export const timerText = new UIText(ui.canvas)
 export const intervalEntity = new Entity()
-export function newTimer(intervals : number){
-gameStarted = true
-let timerValue = new Timer()
+export function newTimer(intervals: number) {
+  gameStarted = true
+  let timerValue = new Timer()
 
-intervalEntity.addComponent(new utils.Interval(1000, () => {
+  intervalEntity.addComponent(new utils.Interval(1000, () => {
     timerText.value = timerValue.updateTimeString(intervals)
     intervals -= 1
     log('intervalEntity', intervals)
-    if (intervals < 0 ){
-        intervalEntity.removeComponent(utils.Interval)
-        timerText.value = ''
-        gameStarted = false 
-        ui.displayAnnouncement("Game Over! You Drank:       " + drinkCount + "     Drinks")
-        drinkCounter.set(0)
-        drinkCount = 0
-        Drunk.hide()
-        VeryDrunk.hide()
+    if (intervals < 0) {
+      intervalEntity.removeComponent(utils.Interval)
+      timerText.value = ''
+      gameStarted = false
+      ui.displayAnnouncement("Game Over! You Drank:       " + drinkCount + "     Drinks")
+      drinkCounter.set(0)
+      drinkCount = 0
+      Drunk.hide()
+      VeryDrunk.hide()
     }
-}))
-timerText.color = Color4.White()
-timerText.fontSize = 50
-timerText.positionX = 0
-timerText.positionY = 300
+  }))
+  timerText.color = Color4.White()
+  timerText.fontSize = 50
+  timerText.positionX = 0
+  timerText.positionY = 300
 
 
-engine.addEntity(intervalEntity)
+  engine.addEntity(intervalEntity)
 }
