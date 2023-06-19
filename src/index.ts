@@ -1,6 +1,9 @@
 import * as utils from '@dcl/ecs-scene-utils'
 import * as ui from '@dcl/ui-scene-utils'
 import { Timer } from './timer'
+import { buildLeaderBoard } from './leaderboard'
+import { getScoreBoard, publishScore } from './serverHandler'
+
 
 //variables
 export let health: ui.UIBar
@@ -239,3 +242,29 @@ export function newTimer(intervals: number) {
 
   engine.addEntity(intervalEntity)
 }
+
+
+//LEADERBOARD
+
+const boardParent = new Entity()
+boardParent.addComponent(new PlaneShape())
+let myMaterial1 = new Material
+myMaterial1.albedoColor = Color4.Black()
+boardParent.addComponent(myMaterial1)
+boardParent.addComponent(
+  new Transform(
+    new Transform({
+      position: new Vector3(11, 0, 16),
+      rotation: Quaternion.Euler(0, 90, 0),
+      scale: new Vector3(10,8,0)
+    })
+  )
+)
+engine.addEntity(boardParent)
+
+async function updateBoard() {
+  const scoreData: any = await getScoreBoard() // data.scoreBoard
+  buildLeaderBoard(scoreData, boardParent, 10).catch((error) => log(error))
+}
+
+updateBoard().catch((error) => log(error))
