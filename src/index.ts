@@ -254,9 +254,9 @@ boardParent.addComponent(myMaterial1)
 boardParent.addComponent(
   new Transform(
     new Transform({
-      position: new Vector3(11, 0, 16),
-      rotation: Quaternion.Euler(0, 90, 0),
-      scale: new Vector3(10,8,0)
+      position: new Vector3(11, 5, 14),
+      rotation: Quaternion.Euler(0, 45, 0),
+      scale: new Vector3(8,8,0)
     })
   )
 )
